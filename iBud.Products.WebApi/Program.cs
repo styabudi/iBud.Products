@@ -1,3 +1,4 @@
+using iBud.Products.Application;
 using iBud.Products.Infrastructure;
 using iBud.Products.Infrastructure.Context;
 using Microsoft.AspNetCore.Identity;
@@ -5,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 {
-    builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
     
     builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("PGConnectionString"), 
