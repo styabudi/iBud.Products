@@ -41,7 +41,7 @@ public class AuthenticationsService : IAuthenticationService
                 if (userIsCreated.Succeeded)
                 {
                     result.Token = _tokenGenerator.GenerateToken(user);
-                    result.User = user;
+                    result.User = new AuthUserResult { Id = user.Id, Username = user.UserName, Email = user.Email };
                     result.IsSuccess = true;
                 }
                 else
@@ -53,6 +53,40 @@ public class AuthenticationsService : IAuthenticationService
                 }
             }
 
+        }
+        catch (Exception ex)
+        {
+            result.Errors.Add(ex.Message);
+        }
+        return result;
+    }
+    public async Task<AuthenticationServiceResult> Login(UserLogin model)
+    {
+        var result = new AuthenticationServiceResult();
+        try
+        {
+            var userExist = await _userManager.FindByEmailAsync(model.Email);
+            if (userExist is null)
+            {
+                result.Errors.Add("User not found!;");
+                return result;
+            }
+
+            var isCorrectUser = await _userManager.CheckPasswordAsync(userExist, model.Password);
+            if (!isCorrectUser)
+            {
+                result.Errors.Add("Email or password is incorrect!");
+                return result;
+            }
+
+            result.User = new AuthUserResult
+            {
+                Id = userExist.Id,
+                Username = userExist.UserName,
+                Email = userExist.Email
+            };
+            result.Token = _tokenGenerator.GenerateToken(userExist);
+            result.IsSuccess = true;
         }
         catch (Exception ex)
         {

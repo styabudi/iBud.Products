@@ -5,4 +5,5 @@ namespace iBud.Products.Application.Interfaces.Authentication;
 public interface IAuthenticationService
 {
     Task<AuthenticationServiceResult> Register(UserRegistration model);
+    Task<AuthenticationServiceResult> Login(UserLogin model);
 }

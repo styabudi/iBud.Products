@@ -28,4 +28,18 @@ public class AuthenticationController : ControllerBase
         }
         return BadRequest();
     }
+
+    [HttpPost]
+    [Route("Login")]
+    public async Task<IActionResult> Login([FromBody] UserLogin model)
+    {
+        if (ModelState.IsValid)
+        {
+            var userSigned = await _authService.Login(model);
+            if (userSigned.IsSuccess)
+                return Ok(userSigned);
+            return BadRequest(userSigned);
+        }
+        return BadRequest();
+    }
 }
