@@ -1,4 +1,5 @@
 using iBud.Products.Application.Interfaces.Authentication;
+using iBud.Products.Infrastructure.Common.Authentication;
 using iBud.Products.Infrastructure.Models.Dtos.Input.Authentication;
 using iBud.Products.Infrastructure.Models.Dtos.Output.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -7,9 +8,11 @@ namespace iBud.Products.Application.Services.Authentication;
 public class AuthenticationsService : IAuthenticationService
 {
     private readonly UserManager<IdentityUser> _userManager;
-    public AuthenticationsService(UserManager<IdentityUser> userManager)
+    private readonly ITokenGenerator _tokenGenerator;
+    public AuthenticationsService(UserManager<IdentityUser> userManager, ITokenGenerator tokenGenerator)
     {
         _userManager = userManager;
+        _tokenGenerator = tokenGenerator;
     }
 
     public async Task<AuthenticationServiceResult> Register(UserRegistration model)
@@ -37,6 +40,7 @@ public class AuthenticationsService : IAuthenticationService
                 var userIsCreated = await _userManager.CreateAsync(user, model.Password);
                 if (userIsCreated.Succeeded)
                 {
+                    result.Token = _tokenGenerator.GenerateToken(user);
                     result.User = user;
                     result.IsSuccess = true;
                 }
