@@ -19,6 +19,7 @@ public class AuthenticationController : ControllerBase
     [Route("Register")]
     public async Task<IActionResult> Register([FromBody] UserRegistration model)
     {
+        model.URLCallback = Request.Scheme + "://" + Request.Host + Url.Action("EmailConfirmation", "Authentication", new { userId = "userIdValue", secretCode = "codeValue" });
         if (ModelState.IsValid)
         {
             var userCreated = await _authService.Register(model);
@@ -41,5 +42,17 @@ public class AuthenticationController : ControllerBase
             return BadRequest(userSigned);
         }
         return BadRequest();
+    }
+
+    public async Task<IActionResult> EmailConfirmation(string userId, string secretCode)
+    {
+        var result = await _authService.EmailConfirmation(userId, secretCode);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result);
+        }
+
+        return base.Content(System.IO.File.ReadAllText(@"./Assets/Templates/Mail/AccountVerified.html"), "text/html");
     }
 }

@@ -6,4 +6,5 @@ public interface IAuthenticationService
 {
     Task<AuthenticationServiceResult> Register(UserRegistration model);
     Task<AuthenticationServiceResult> Login(UserLogin model);
+    Task<EmailConfirmationResult> EmailConfirmation(string userId, string secretCode);
 }
